@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>Matrix Operations</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 120vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            flex-direction: column;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 100px;
+            width: 1200%;
+            max-width: 1200px;
+            text-align: center;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+        }
+        table {
+            border-collapse: collapse;
+            margin: 0 auto;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        .matrix-container {
+            margin: 0 20px;
+            flex: 1;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 40px;
+        }
+        input {
+            width: 60px;
+            text-align: center;
+        }
+        button {
+            background-color: #e7e7e7;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+            min-width: 70px;
+        }
+        button:hover {
+            background-color: #d4d4d4;
+        }
+        h3 {
+            text-align: center;
+        }
+        .card {
+            background-color: #f7f7f7;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .results {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .result-container {
+            width: 45%;
+        }
+        .result-card {
+            background-color: #f7f7f7;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            margin: 10px 10px;
+        }
+        .result-card {
+            background-color: #f7f7f7;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            margin: 10px 10px;
+        }
+        
+        /* اضافه کردن کد زیر برای تغییر اندازه */
+        .results {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }        
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.4.2/math.min.js"></script>
+</head>
+<body>
+    <body>
+        <div class="container">
+            <div class="matrix-container">
+                <h3>Matrix A</h3>
+                <div id="matrixA"></div>
+                <div>
+                    <button onclick="addRowColumn('matrixA')">+</button>
+                    <button onclick="removeRowColumn('matrixA')">-</button>
+                    <button onclick="clearMatrix('matrixA')">Clr</button>
+                    <button onclick="setZeroMatrix('matrixA')">O</button>
+                    <button onclick="setIdentityMatrix('matrixA')">I</button>
+                    <button onclick="calculateDet('matrixA')">Det(A)</button>
+                    <button onclick="calculateEig('matrixA')">Eig(A)</button>
+                    <button onclick="calculateTranspose('matrixA')">A<sup>T</sup></p></button>
+                    <button onclick="calculateInverse('matrixA')">A<sup>-1</sup></p></button>
+                </div>
+            </div>
+            <div class="button-container">
+                <button onclick="calculate('add')">A + B</button>
+                <button onclick="calculate('subtract')">A - B</button>
+                <button onclick="calculate('multiply')">A × B</button>
+            </div>
+            <div class="matrix-container">
+                <h3>Matrix B</h3>
+                <div id="matrixB"></div>
+                <div>
+                    <button onclick="addRowColumn('matrixB')">+</button>
+                    <button onclick="removeRowColumn('matrixB')">-</button>
+                    <button onclick="clearMatrix('matrixB')">Clr</button>
+                    <button onclick="setZeroMatrix('matrixB')">O</button>
+                    <button onclick="setIdentityMatrix('matrixB')">I</button>
+                    <button onclick="calculateDet('matrixB')">Det(B)</button>
+                    <button onclick="calculateEig('matrixB')">Eig(B)</button>
+                    <button onclick="calculateTranspose('matrixB')">B<sup>T</sup></p></button>
+                    <button onclick="calculateInverse('matrixB')">B<sup>-1</sup></p></button>
+                </div>
+            </div>
+        </div>
+        <div class="results">
+            <div class="result-card" style="flex: 0 0 30%;">
+                <h3>Determinant</h3>
+                <div id="determinant"></div>
+            </div>
+            <div class="result-card" style="flex: 0 0 35%;">
+                <h3>Eigenvalues</h3>
+                <div id="eigenvalues"></div>
+            </div>
+            <div class="result-card" style="flex: 0 0 35%;">
+                <h3>Result</h3>
+                <div id="result"></div>
+            </div>
+        </div>
+    
+        <script>
+            let sizeA = 3;
+            let sizeB = 3;
+    
+            function createMatrix(id, size) {
+                let container = document.getElementById(id);
+                container.innerHTML = '';
+                let table = document.createElement('table');
+                for (let i = 0; i < size; i++) {
+                    let tr = document.createElement('tr');
+                    for (let j = 0; j < size; j++) {
+                        let td = document.createElement('td');
+                        let input = document.createElement('input');
+                        input.type = 'text';
+                        td.appendChild(input);
+                        tr.appendChild(td);
+                    }
+                    table.appendChild(tr);
+                }
+                container.appendChild(table);
+            }
+    
+            function addRowColumn(id) {
+                if (id === 'matrixA') {
+                    sizeA = Math.min(sizeA + 1, 10);
+                    createMatrix(id, sizeA);
+                } else {
+                    sizeB = Math.min(sizeB + 1, 10);
+                    createMatrix(id, sizeB);
+                }
+            }
+    
+            function removeRowColumn(id) {
+                if (id === 'matrixA') {
+                    sizeA = Math.max(sizeA - 1, 2);
+                    createMatrix(id, sizeA);
+                } else {
+                    sizeB = Math.max(sizeB - 1, 2);
+                    createMatrix(id, sizeB);
+                }
+            }
+    
+            function clearMatrix(id) {
+                let container = document.getElementById(id);
+                let inputs = container.getElementsByTagName('input');
+                for (let input of inputs) {
+                    input.value = '';
+                }
+            }
+    
+            function setZeroMatrix(id) {
+                let container = document.getElementById(id);
+                let inputs = container.getElementsByTagName('input');
+                for (let input of inputs) {
+                    input.value = '0';
+                }
+            }
+    
+            function setIdentityMatrix(id) {
+                let container = document.getElementById(id);
+                let inputs = container.getElementsByTagName('input');
+                let size = id === 'matrixA' ? sizeA : sizeB;
+                for (let i = 0; i < size; i++) {
+                    for (let j = 0; j < size; j++) {
+                        inputs[i * size + j].value = (i === j) ? '1' : '0';
+                    }
+                }
+            }
+
+            function formatMatrix(matrix) {
+                return matrix.map(row => row.map(value => parseFloat(value.toFixed(3))));
+            }
+            
+            function getMatrixValues(id, size) {
+                let container = document.getElementById(id);
+                let inputs = container.getElementsByTagName('input');
+                let values = [];
+                for (let i = 0; i < size; i++) {
+                    values[i] = [];
+                    for (let j = 0; j < size; j++) {
+                        values[i][j] = math.complex(inputs[i * size + j].value || 0);
+                    }
+                }
+                return values;
+            }
+    
+            function determinant(matrix) {
+                return math.det(matrix);
+            }
+    
+            function calculateDet(id) {
+                try {
+                    let matrix = getMatrixValues(id, id === 'matrixA' ? sizeA : sizeB);
+                    let det = determinant(matrix);
+                    let determinantContainer = document.getElementById('determinant');
+                    determinantContainer.innerHTML = `${id} Determinant: ${det}`;
+                } catch (error) {
+                    let determinantContainer = document.getElementById('determinant');
+                    determinantContainer.innerHTML = `${id} Determinant: Calculation Error`;
+                }
+            }
+    
+            function calculateEig(id) {
+                try {
+                    let matrix = getMatrixValues(id, id === 'matrixA' ? sizeA : sizeB);
+                    let { values, vectors } = math.eigs(matrix);
+                    let eigenvaluesContainer = document.getElementById('eigenvalues');
+            
+                    // HTML برای جدول مقادیر ویژه
+                    let eigenvaluesHtml = `<h4>${id} Eigenvalues:</h4><table style="margin: auto; border-collapse: collapse; width: 100%;"><tr><th style="border: 1px solid #ddd; padding: 8px;">Index</th><th style="border: 1px solid #ddd; padding: 8px;">Value</th></tr>`;
+                    
+                    values.forEach((val, index) => {
+                        eigenvaluesHtml += `<tr style="border: 1px solid #ddd;"><td style="border: 1px solid #ddd; padding: 8px;">${index + 1}</td><td style="border: 1px solid #ddd; padding: 8px;">${val.toString()}</td></tr>`;
+                    });
+                    
+                    eigenvaluesHtml += '</table>';
+            
+                    // HTML برای بردارهای ویژه
+                    let eigenvectorsHtml = `<h4>${id} Eigenvectors:</h4><table style="margin: auto; border-collapse: collapse; width: 100%;"><tr><th style="border: 1px solid #ddd; padding: 8px;">Index</th><th style="border: 1px solid #ddd; padding: 8px;">Vector</th></tr>`;
+                    
+                    vectors.forEach((vec, index) => {
+                        eigenvectorsHtml += `<tr style="border: 1px solid #ddd;"><td style="border: 1px solid #ddd; padding: 8px;">${index + 1}</td><td style="border: 1px solid #ddd; padding: 8px;">[${vec.map(v => v.toString()).join(', ')}]</td></tr>`;
+                    });
+                    
+                    eigenvectorsHtml += '</table>';
+            
+                    // اضافه کردن HTML به container
+                    eigenvaluesContainer.innerHTML = `
+                        <div style="display: flex; justify-content: space-between;">
+                            <div style="flex: 1; margin-right: 10px;">${eigenvaluesHtml}</div>
+                            <div style="flex: 1; margin-left: 10px;">${eigenvectorsHtml}</div>
+                        </div>
+                    `;
+            
+                } catch (error) {
+                    let eigenvaluesContainer = document.getElementById('eigenvalues');
+                    eigenvaluesContainer.innerHTML = `${id} Eigenvalues: Calculation Error`;
+                }
+            }            
+    
+            function calculateTranspose(id) {
+                try {
+                    let size = id === 'matrixA' ? sizeA : sizeB;
+                    let matrix = getMatrixValues(id, size);
+                    let transposed = math.transpose(matrix);
+                    displayResult(transposed, `Transposed Matrix ${id === 'matrixA' ? 'A' : 'B'}`);
+                } catch (error) {
+                    displayResult('Calculation Error', `Transposed Matrix ${id === 'matrixA' ? 'A' : 'B'}`);
+                }
+            }
+            
+            function calculateInverse(id) {
+                try {
+                    let size = id === 'matrixA' ? sizeA : sizeB;
+                    let matrix = getMatrixValues(id, size);
+                    let inverse = math.inv(matrix);
+                    displayResult(inverse, `Inverse Matrix ${id === 'matrixA' ? 'A' : 'B'}`);
+                } catch (error) {
+                    displayResult('Calculation Error', `Inverse Matrix ${id === 'matrixA' ? 'A' : 'B'}`);
+                }
+            }
+            
+            function calculate(operation) {
+                let matrixA = getMatrixValues('matrixA', sizeA);
+                let matrixB = getMatrixValues('matrixB', sizeB);
+                let result;
+                try {
+                    switch (operation) {
+                        case 'add':
+                            result = math.add(matrixA, matrixB);
+                            break;
+                        case 'subtract':
+                            result = math.subtract(matrixA, matrixB);
+                            break;
+                        case 'multiply':
+                            result = math.multiply(matrixA, matrixB);
+                            break;
+                        default:
+                            result = [];
+                    }
+                    displayResult(result);
+                } catch (error) {
+                    displayResult('Calculation Error');
+                }
+            }
+    
+            function displayResult(result, title = 'Result') {
+                let resultContainer = document.getElementById('result');
+                resultContainer.innerHTML = `<h4>${title}:</h4>`;
+                if (Array.isArray(result)) {
+                    let table = document.createElement('table');
+                    for (let i = 0; i < result.length; i++) {
+                        let tr = document.createElement('tr');
+                        for (let j = 0; j < result[i].length; j++) {
+                            let td = document.createElement('td');
+                            td.textContent = result[i][j];
+                            tr.appendChild(td);
+                        }
+                        table.appendChild(tr);
+                    }
+                    resultContainer.appendChild(table);
+                } else {
+                    resultContainer.textContent = result;
+                }
+            }
+    
+            createMatrix('matrixA', sizeA);
+            createMatrix('matrixB', sizeB);
+        </script>
+    </body>
+    
